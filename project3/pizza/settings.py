@@ -12,6 +12,12 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 
 import os
 
+#configures the template that crispy forms uses for the registration forms
+CRISPY_TEMPLATE_PACK="bootstrap4"
+
+#CSRF token:
+CSRF_COOKIE_SECURE=False
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -32,12 +38,14 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'orders.apps.OrdersConfig',
+    'users.apps.UsersConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [

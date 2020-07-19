@@ -1,0 +1,62 @@
+
+{% extends "orders/base.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block body %}
+    <h3>You're So Close to Some Delicious Pizza!</h3>
+
+    <form method="post" action="{% url 'login' %}">
+      {% csrf_token %}
+      <div class="form-group">
+        <label>Username</label>
+        <input type="username" name="username" class="form-control" placeholder="Enter Your Username">
+      </div>
+      <div class="form-group">
+        <label for="exampleInputPassword1">Password</label>
+        <input type="password" name="password" class="form-control" placeholder="Password">
+      </div>
+      <!-- <div class="form-check">
+        <input type="checkbox" class="form-check-input" id="exampleCheck1">
+        <label class="form-check-label" for="exampleCheck1">Remember Me (doesn't work rn)</label>
+      </div> -->
+      <button type="submit" class="btn btn-primary" value="login">Login</button>
+
+    </form>
+  <p>Don't have an account? Register <a href="/register/">here</a>!</p>
+
+{{message}}
+
+
+    <!-- <form action="{% url 'register' %}" id="registration">
+      {% csrf_token %}
+    <div class="container">
+      <h1>Register</h1>
+      <p>Please fill in this form to create an account.</p>
+      <hr>
+
+      <label for="email"><b>First Name</b></label>
+      <input type="text" required>
+
+      <label for="email"><b>Last Name</b></label>
+      <input type="text" required>
+
+      <label for="email"><b>Email</b></label>
+      <input type="text" placeholder="Enter Email" name="email" id="email" required>
+
+      <label for="psw"><b>Password</b></label>
+      <input type="password" placeholder="Enter Password" name="psw" id="psw" required>
+
+      <label for="psw-repeat"><b>Repeat Password</b></label>
+      <input type="password" placeholder="Repeat Password" name="psw-repeat" id="psw-repeat" required>
+      <hr>
+
+      <button type="submit" class="registerbtn" value="register">Register</button>
+    </div>
+
+    <div class="container signin">
+      <p>Already have an account? <a href="#">Sign in</a>.</p>
+    </div>
+  </form> -->
+
+{% endblock %}

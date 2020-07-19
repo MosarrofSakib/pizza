@@ -1,0 +1,14 @@
+{% extends "orders/base.html" %}
+
+{% block body %}
+
+<h3>Hello {{user.username}}</h3>
+
+
+<form class="" action="{% url 'logout' %}" method="post">
+  {% csrf_token %}
+  <button type="submit" name="button" value="logout" >Logout</button>
+</form>
+
+
+{% endblock %}

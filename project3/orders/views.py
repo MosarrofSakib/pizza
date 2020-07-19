@@ -1,6 +1,32 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
+from .models import Regular
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+from django.urls import reverse
+from django.shortcuts import render, redirect
+from django import forms
 
-# Create your views here.
+# Create your views here
 def index(request):
-    return HttpResponse("Project 3: TODO")
+    if not request.user.is_authenticated:
+        return render(request, "orders/login.html", {"message":None})
+    context = {
+        "user":request.user
+    }
+    return render(request, "orders/homepage.html", context)
+
+def login_view(request):
+    username = request.POST.get('username')
+    password = request.POST.get('password')
+    user = authenticate(request, username=username, password=password)
+    if user is not None:
+        login(request, user)
+        return HttpResponseRedirect(reverse("index"))
+    else:
+        return render(request, "orders/login.html", {"message":"invalid credentials!"})
+
+def logout_view(request):
+    logout(request)
+    return render(request, "orders/login.html", {"message":"You have been successfully logged out"})
