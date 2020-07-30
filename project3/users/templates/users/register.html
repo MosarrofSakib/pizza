@@ -5,10 +5,10 @@
 <div class="container">
 
 
-<form action="{% url 'register' %}">
+<form method="POST">
   {% csrf_token %}
 
-  {{ form }}
+  {{ form.as_p }}
 
 <button type="submit" class="registerbtn">Register</button>
     <p>Already have an account? <a href="/login/">Login</a>.</p>

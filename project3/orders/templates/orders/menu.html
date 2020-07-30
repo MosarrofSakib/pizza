@@ -1,0 +1,55 @@
+{% extends "orders/base.html" %}
+
+{% block body %}
+
+<h2>Pizza Menu</h2>
+
+<table>
+<tbody>
+  <thead>
+    Regulars
+  </thead>
+
+  {% for item in pizza %}
+
+
+<tr>
+  <td> {{ item.item }}, {{ item.toppings }}, Price: {{ item.price }}</td>
+  <td><button type="info" id="{{ item.id }}" name="cart">Add to Cart</button>
+</td>
+
+</tr>
+
+
+</tbody>
+
+{% endfor %}
+
+</table>
+<!--
+  <table>
+
+    {% for item in regular_pizza %}
+
+    <ul>
+      <li>
+        {{ item }}
+      </li>
+    </ul>
+
+    {% endfor %}
+
+    {% for item in sicilian_pizza %}
+
+    <ul>
+      <li>
+        {{ item }}
+      </li>
+    </ul>
+
+    {% endfor %}
+  </table> -->
+
+</div>
+
+{% endblock %}
