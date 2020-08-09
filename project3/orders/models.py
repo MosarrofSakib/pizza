@@ -95,23 +95,17 @@ class Salad(models.Model):
     def __str__(self):
         return f"{self.item}"
 
-#consolidates items into one class model
+#cart specific to user
+#remove null values after development stage
 class Cart(models.Model):
-    #link the pizzas
-    # regular = models.ForeignKey(Regular, on_delete=models.CASCADE)
-    # sicilian = models.ForeignKey(Sicilian, on_delete=models.CASCADE)
-    #pizza = models.ForeignKey(Pizza, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null = True)
+    pizza = models.CharField(max_length = 64, null = True)
     quantity = models.IntegerField(default = 1)
+    price = models.DecimalField(max_digits = 6, decimal_places = 2, null = True)
 
 #used to fulfill the order
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     item = models.ManyToManyField(Cart)
     complete = models.BooleanField(default = False)
-
-# class Test(models.Model):
-#     item = models.CharField(max_length=64)
-#     price = models.DecimalField(max_digits = 4, decimal_places = 2)
-#
-#     def __str__(self):
-#         return f"{self.item}"
+    price = models.DecimalField(max_digits = 6, decimal_places = 2, null = True)

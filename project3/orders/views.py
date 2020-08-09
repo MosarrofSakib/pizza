@@ -7,6 +7,8 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from django.shortcuts import render, redirect
 from django import forms
+from django.contrib.auth.decorators import login_required
+from django.db.models import F
 
 # Create your views here
 def index(request):
@@ -37,21 +39,36 @@ def menu(request):
     }
     return render(request, "orders/menu.html", context)
 
-def add_to_cart(request):
-    #gets the items from the active order
-    #note that this query returns ALL the items that match the criteria
-    # regular = Cart.objects.get(name = regular)
-    # sicilian = Cart.objects.get(name = sicilian)
+def show_cart(request):
+    context = {
+    "cart":Cart.objects.all()
+    }
 
-    #need some way to add only the clicked item to the cart
-    ## query for the id of the clicked item, add it to cart, then query from cart?
-    order = Pizza.objects.get()
+#@login_required(login_url = '/login/')
+def add_to_cart(request, item_id):
+    #query database for the correct item
+    order = Pizza.objects.get(id = item_id)
 
-    #create a new item in the cart
+    #if item already exists in cart, increase it's quantity by one
+    if Cart.objects.filter(pizza = order.item).exists():
+        Cart.objects.filter(pizza = order.item).update(quantity = F('quantity') + 1)
+        #return render(request, "orders/index.html", {"message":order.quantity})
 
-    #filter out the completed orders
-    new_order = Order.filter(user = request.user, complete = False, )
-    if new_order.exists():
-        pass
+    #if item does not exist, add it to the Cart
     else:
-        pass
+        new_item = Cart.objects.create(id = item_id, pizza = order.item)
+
+    #test connection
+    return render(request, "orders/index.html", {"message":order.item})
+
+def remove_from_cart(request, cart_id):
+    context = {
+    "cart": Cart.objects.all()
+    }
+
+
+
+    #return render(request, "orders/cart.html", context)
+
+def place_order(request):
+    pass

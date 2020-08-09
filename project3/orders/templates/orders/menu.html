@@ -1,5 +1,6 @@
 {% extends "orders/base.html" %}
 
+
 {% block body %}
 
 <h2>Pizza Menu</h2>
@@ -15,7 +16,10 @@
 
 <tr>
   <td> {{ item.item }}, {{ item.toppings }}, Price: {{ item.price }}</td>
-  <td><button type="info" id="{{ item.id }}" name="cart">Add to Cart</button>
+  <td>
+
+<a href="{% url 'add_to_cart' item.id %}" data-id = "{{ item.id }}" id = "{{ item.id }}"><button type="info" name="item">Add to Cart</button></a>
+
 </td>
 
 </tr>
