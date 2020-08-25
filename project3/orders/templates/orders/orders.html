@@ -1,0 +1,26 @@
+{% extends "orders/base.html" %}
+
+{% block body %}
+
+<body id="orders">
+
+  <table>
+    <tr>
+      <td>User</td>
+      <td>Order</td>
+      <td>Price</td>
+    </tr>
+
+{% for item in order %}
+    <tr>
+      <td>{{order.user}}</td>
+      <td>{{order.item}}</td>
+      <td>{{order.subtotal}}</td>
+    </tr>
+
+    {% endfor %}
+  </table>
+
+</body>
+
+{% endblock %}

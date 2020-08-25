@@ -12,6 +12,7 @@ urlpatterns = [
     path('register/', users_views.register_view, name = "register"),
     path('menu/', views.menu, name = "menu"),
     path('cart/<int:item_id>', views.add_to_cart, name = "add_to_cart"),
-    path('remove/<int:cart_id', views.remove_from_cart, name = "remove_from_cart"),
-    path('show_cart/', views.show_cart, name = show_cart)
+    path('remove/<int:cart_id>', views.remove_from_cart, name = "remove_from_cart"),
+    path('placeorder/', views.place_order, name = "place_order"),
+    # path('config/', views.stripe_config, name = 'config')
 ]

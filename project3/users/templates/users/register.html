@@ -1,11 +1,19 @@
 {% extends "orders/base.html" %}
 
 {% block body %}
+<body id="register" style="background-image:url(/static/orders/pizza2.jpg); background-repeat: no-repeat; background-size: cover;">
 
-<div class="container">
+
+<div class="container" style="background-color:white; opacity:90%;">
+
+<div class="row">
+  <div class="col">
+    <h2>Register Here!</h2>
+  </div>
+</div>
 
 
-<form method="POST">
+<form method="POST" action="{% url 'register' %}">
   {% csrf_token %}
 
   {{ form.as_p }}
@@ -14,5 +22,5 @@
     <p>Already have an account? <a href="/login/">Login</a>.</p>
 </form>
 </div>
-
+</body>
 {% endblock %}

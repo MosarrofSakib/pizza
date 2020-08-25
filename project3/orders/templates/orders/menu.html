@@ -1,59 +1,252 @@
+<!DOCTYPE html>
+
+
 {% extends "orders/base.html" %}
 
 
 {% block body %}
 
-<h2>Pizza Menu</h2>
-
-<table>
-<tbody>
-  <thead>
-    Regulars
-  </thead>
-
-  {% for item in pizza %}
 
 
-<tr>
-  <td> {{ item.item }}, {{ item.toppings }}, Price: {{ item.price }}</td>
-  <td>
+<body id="menu">
 
+  <script type="text/javascript">
+
+    function openNav() {
+      document.getElementById("mySidepanel").style.width = "13%";
+      document.getElementById("mySidepanel").style.height = "100%";
+      document.getElementById("menu").style.marginLeft = "13%";
+
+    }
+
+    /* Set the width of the sidebar to 0 (hide it) */
+    function closeNav() {
+      document.getElementById("mySidepanel").style.width = "0";
+      document.getElementById("menu").style.marginLeft = "0%";
+
+    }
+
+    const buy = document.getElementById('checkout').addEventListener('click', event {
+      stripe.redirectToCheckout({
+        sessionId: '{{ session_id }}'
+      }).then(function (result) {
+        //some result
+      })
+    })
+
+
+
+    // Create an instance of the Stripe object with your publishable API key
+    // var stripe = Stripe('pk_test_51HGRDpI2Nu98lgt7CcGeNFQRZiqjTMM9emJ28YerE7zUVHhQTXszGMZAEGptEYHQSMRnStGzMo0C9L8ZXr1JBDrz00evkTwDCU');
+    // var checkoutButton = document.getElementById('checkout');
+  // checkoutButton.addEventListener('click', function() {
+      //   // Create a new Checkout Session using the server-side endpoint you
+      //   // created in step 3.
+      //   fetch('/create-checkout-session', {
+      //     method: 'POST',
+      //   })
+      //   .then(function(response) {
+      //     return response.json();
+      //   })
+      //   .then(function(session) {
+      //     return stripe.redirectToCheckout({ sessionId: session.id });
+      //   })
+      //   .then(function(result) {
+      //     // If `redirectToCheckout` fails due to a browser or network
+      //     // error, you should display the localized error message to your
+      //     // customer using `error.message`.
+      //     if (result.error) {
+      //       alert(result.error.message);
+      //     }
+      //   })
+      //   .catch(function(error) {
+      //     console.error('Error:', error);
+      //   });
+      // });
+
+
+  </script>
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">Navbar</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav">
+        <li class="nav-item active">
+          <a class="nav-link" href="{% url 'index' %}">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'menu' %}">Menu</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Contact Us</a>
+        </li>
+        <li class="nav-item dropdown" style="margin-left: 800px">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {{user.username}}
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            <a class="dropdown-item" onclick="openNav()">Cart</a>
+            <a class="dropdown-item" href="#">My Orders</a>
+            <a class="dropdown-item" href="{% url 'logout' %}" style="color:red">
+              Logout
+            </a>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+
+    <div id="mySidepanel" class="sidepanel">
+      <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+
+        <h4 style="color: white">Your Cart:</h4>
+
+      {% for item in cart %}
+
+      <div class="card" style="margin: 10px 10px 10px 10px;">
+        <ul style="list-style-type:none;">
+          <li>{{ item.pizza }}</li>
+          <li>Price: ${{ item.price }}</li>
+          <li>x {{ item.quantity }}</li>
+          <a style="color: red; text-align:center;" href="{% url 'remove_from_cart' item.id %}">Remove</a>
+        </ul>
+      </div>
+
+
+
+      {% endfor %}
+
+      {% if cart %}
+        <h4 style="color:white;">Subtotal: ${{ active.subtotal }}</h4>
+      {% else %}
+      {% endif %}
+
+      {% if cart %}
+      <a href="{% url 'checkout' %}" id="checkout"><button type="primary" name="button" style="color: green; cursor: pointer">Checkout</button></a>
+      {% else %}
+      {% endif %}
+    </div>
+
+
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <h3 style="text-align: center">Regular Pizzas</h3>
+    </div>
+  </div>
+
+<div class="row">
+  <div class="col">
+    <h4>Pizzas</h4>
+  </div>
+
+  <div class="col">
+    <h4>Size</h4>
+  </div>
+
+  <div class="col">
+    <h4>Toppings</h4>
+  </div>
+
+  <div class="col">
+    <h4>Price</h4>
+  </div>
+
+  <div class="col">
+    <h4>Add to Cart</h4>
+  </div>
+
+</div>
+
+{% for item in pizza %}
+<div class="row">
+  <div class="col">
+    <p>{{ item.item }}</p>
+  </div>
+
+  <div class="col">
+    <p>{{ item.size }}</p>
+  </div>
+
+  <div class="col">
+    <p>{{ item.toppings }}</p>
+  </div>
+
+  <div class="col">
+    <p>{{ item.price }}</p>
+  </div>
+
+  <div class="col">
 <a href="{% url 'add_to_cart' item.id %}" data-id = "{{ item.id }}" id = "{{ item.id }}"><button type="info" name="item">Add to Cart</button></a>
-
-</td>
-
-</tr>
-
-
-</tbody>
+</div>
+</div>
 
 {% endfor %}
 
-</table>
-<!--
-  <table>
+<div class="row">
+  <div class="col">
+    <h3 style="text-align: center;">Sicilian Pizzas</h3>
+  </div>
+</div>
 
-    {% for item in regular_pizza %}
+<div class="row">
+<div class="col">
+  <h4>Pizzas</h4>
+</div>
 
-    <ul>
-      <li>
-        {{ item }}
-      </li>
-    </ul>
+<div class="col">
+  <h4>Size</h4>
+</div>
 
-    {% endfor %}
+<div class="col">
+  <h4>Toppings</h4>
+</div>
 
-    {% for item in sicilian_pizza %}
+<div class="col">
+  <h4>Price</h4>
+</div>
 
-    <ul>
-      <li>
-        {{ item }}
-      </li>
-    </ul>
-
-    {% endfor %}
-  </table> -->
+<div class="col">
+  <h4>Add to Cart</h4>
+</div>
 
 </div>
+
+
+{% for item in sicilian %}
+<div class="row">
+  <div class="col">
+    <p>{{ item.item }}</p>
+  </div>
+
+  <div class="col">
+    <p>{{ item.size }}</p>
+  </div>
+
+  <div class="col">
+    <p>{{ item.toppings }}</p>
+  </div>
+
+  <div class="col">
+    <p>{{ item.price }}</p>
+  </div>
+
+  <div class="col">
+<a href="{% url 'add_to_cart' item.id %}" data-id = "{{ item.id }}" id = "{{ item.id }}"><button type="info" name="item">Add to Cart</button></a>
+</div>
+</div>
+
+{% endfor %}
+
+
+</div>
+
+
+
+</body>
 
 {% endblock %}

@@ -9,13 +9,14 @@ from django import forms
 from .forms import RegisterForm
 
 #still need to build a way to handle error messages
+#THIS IS A SECURITY RISK!
 def register_view(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get('username')
-            return redirect('index')
+            return redirect('login_view')
     else:
         form = RegisterForm()
     return render(request, 'users/register.html', {"form":form})

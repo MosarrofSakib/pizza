@@ -37,20 +37,20 @@ class Pizza(models.Model):
 #     def __str__(self):
 #         return f"{self.item}, Toppings: {self.num_toppings}, Price: {self.price}"
 #
-# class Sicilian(models.Model):
-#     SMALL = 'S'
-#     LARGE = 'L'
-#
-#     item = models.CharField(max_length=64)
-#
-#     PIZZA_SIZE_CHOICES = [(SMALL,'Small'), (LARGE, 'Large')]
-#     pizza_size = models.CharField(max_length=64, choices = PIZZA_SIZE_CHOICES, default = SMALL)
-#
-#     num_toppings = models.PositiveIntegerField(validators=[MaxValueValidator(4)])
-#     price = models.DecimalField(max_digits = 4, decimal_places = 2)
-#
-#     def __str__(self):
-#         return f"{self.item} Toppings: {self.num_toppings} Price: {self.price}"
+class Sicilian(models.Model):
+    SMALL = 'S'
+    LARGE = 'L'
+
+    item = models.CharField(max_length=64)
+
+    PIZZA_SIZE_CHOICES = [(SMALL,'Small'), (LARGE, 'Large')]
+    size = models.CharField(max_length=64, choices = PIZZA_SIZE_CHOICES, default = SMALL)
+
+    toppings = models.PositiveIntegerField(validators=[MaxValueValidator(4)])
+    price = models.DecimalField(max_digits = 4, decimal_places = 2)
+
+    def __str__(self):
+        return f"{self.item} Toppings: {self.num_toppings} Price: {self.price}"
 
 #idk how to handle the ones that have additional toppings; skipping for now
 class Sub(models.Model):
@@ -101,11 +101,12 @@ class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null = True)
     pizza = models.CharField(max_length = 64, null = True)
     quantity = models.IntegerField(default = 1)
-    price = models.DecimalField(max_digits = 6, decimal_places = 2, null = True)
+    price = models.DecimalField(max_digits = 6, decimal_places = 2, default = 0.00)
 
 #used to fulfill the order
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     item = models.ManyToManyField(Cart)
     complete = models.BooleanField(default = False)
-    price = models.DecimalField(max_digits = 6, decimal_places = 2, null = True)
+    subtotal = models.DecimalField(max_digits = 6, decimal_places = 2, default = 0.00, null = True)
+    #receipt = models.ListCharField(base_field = CharField(max_length = 64), size = None, max_length = 64)

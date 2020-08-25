@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'crispy_forms',
+    'stripe'
 ]
 
 MIDDLEWARE = [
@@ -108,6 +109,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+if DEBUG:
+    #test keys
+    STRIPE_PUBLISHABLE_KEY = 'pk_test_51HGRDpI2Nu98lgt7CcGeNFQRZiqjTMM9emJ28YerE7zUVHhQTXszGMZAEGptEYHQSMRnStGzMo0C9L8ZXr1JBDrz00evkTwDCU'
+    STRIPE_SECRET_KEY = 'sk_test_51HGRDpI2Nu98lgt7LnizEKT7bPmeABSwfX4HQTm1NK1BtaHora6uGrgQfeQae17vI92aIterXKiA0PD4OVtZwyBB008wEHd2hT'
+else:
+    STRIPE_PUBLISHABLE_KEY = 'STRIPE LIVE PUBLISHABLE KEY'
+    STRIPE_SECRET_KEY = 'STRIPE LIVE SECRET KEY'
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
@@ -127,3 +135,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+#STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
