@@ -11,20 +11,24 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import F, Avg, Count, Min, Sum
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-import stripe, json
+import stripe
+import json
 import secrets
 import string
 import random
 from random import randint
 
 # Create your views here
+
+
 def index(request):
     if not request.user.is_authenticated:
-        return render(request, "orders/login.html", {"message":None})
+        return render(request, "orders/login.html", {"message": None})
     context = {
-        "user":request.user
+        "user": request.user
     }
     return render(request, "orders/homepage.html", context)
+
 
 def login_view(request):
     username = request.POST.get('username')
@@ -34,130 +38,143 @@ def login_view(request):
         login(request, user)
         return HttpResponseRedirect(reverse("index"))
     else:
-        return render(request, "orders/login.html", {"message":"invalid credentials!"})
+        return render(request, "orders/login.html", {"message": "invalid credentials!"})
+
 
 def logout_view(request):
     logout(request)
-    return render(request, "orders/login.html", {"message":"Thanks for coming!"})
+    return render(request, "orders/login.html", {"message": "Thanks for coming!"})
+
 
 def menu(request):
     context = {
         "pizza": Pizza.objects.all(),
-        "cart": Cart.objects.filter(user = request.user),
+        "cart": Cart.objects.filter(user=request.user),
         "sicilian": Sicilian.objects.all()
     }
 
-    #if there is no active order
-    if Order.objects.filter(user = request.user, complete = False).exists() == False:
+    # if there is no active order
+    if Order.objects.filter(user=request.user, complete=False).exists() == False:
         context = {
-        "pizza": Pizza.objects.all(),
-        "cart": Cart.objects.filter(user = request.user),
-        "sicilian": Sicilian.objects.all()
+            "pizza": Pizza.objects.all(),
+            "cart": Cart.objects.filter(user=request.user),
+            "sicilian": Sicilian.objects.all()
         }
     else:
         context = {
-        "pizza": Pizza.objects.all(),
-        "cart": Cart.objects.filter(user = request.user),
-        "sicilian": Sicilian.objects.all(),
-        "active": Order.objects.get(user = request.user, complete = False)
+            "pizza": Pizza.objects.all(),
+            "cart": Cart.objects.filter(user=request.user),
+            "sicilian": Sicilian.objects.all(),
+            "active": Order.objects.get(user=request.user, complete=False)
         }
     return render(request, "orders/menu.html", context)
 
-@login_required(login_url = '/orders/login/')
+
+@login_required(login_url='/orders/login/')
 def add_to_cart(request, item_id):
 
-    #query database for the correct item
-    #the filter queryset is returning ALL items that match this query
-    order = Pizza.objects.get(id = item_id)
+    # query database for the correct item
+    # the filter queryset is returning ALL items that match this query
+    order = Pizza.objects.get(id=item_id)
 
-    #consider using get to return a single object to manipulate for the final price
+    # consider using get to return a single object to manipulate for the final price
 
-    #generate a new active order if one does not already exist
-    if Order.objects.filter(user = request.user, complete = False).exists() == False:
-        Order.objects.create(user = request.user, complete = False, subtotal = 0)
+    # generate a new active order if one does not already exist
+    if Order.objects.filter(user=request.user, complete=False).exists() == False:
+        Order.objects.create(user=request.user, complete=False, subtotal=0)
 
-    #get user's current order
-    current = Order.objects.get(user = request.user, complete = False)
+    # get user's current order
+    current = Order.objects.get(user=request.user, complete=False)
 
-    #get the total price of the items in the cart
-    #total = Cart.objects.filter(user = request.user).aggregate(Sum('price'))['price__sum'] #returns the value of the price__sum key
+    # get the total price of the items in the cart
+    # total = Cart.objects.filter(user = request.user).aggregate(Sum('price'))['price__sum'] #returns the value of the price__sum key
 
+    # if item already exists in cart, increase it's quantity by one and add the price to the subtotal
+    if Cart.objects.filter(user=request.user, pizza=order.item).exists():
+        Cart.objects.filter(user=request.user, pizza=order.item,
+                            price=order.price).update(quantity=F('quantity') + 1)
+        Order.objects.filter(user=request.user, complete=False).update(
+            subtotal=current.subtotal + order.price)
 
-    #if item already exists in cart, increase it's quantity by one and add the price to the subtotal
-    if Cart.objects.filter(user = request.user, pizza = order.item).exists():
-        Cart.objects.filter(user = request.user, pizza = order.item, price = order.price).update(quantity = F('quantity') + 1)
-        Order.objects.filter(user = request.user, complete = False).update(subtotal = current.subtotal + order.price)
-
-    #if item does not exist, add it to the Cart and update the price
+    # if item does not exist, add it to the Cart and update the price
     else:
-        new_item = Cart.objects.create(user = request.user, id = item_id, pizza = order.item, price = order.price)
-        Order.objects.filter(user = request.user).update(subtotal = current.subtotal + order.price)
+        new_item = Cart.objects.create(
+            user=request.user, id=item_id, pizza=order.item, price=order.price)
+        Order.objects.filter(user=request.user).update(
+            subtotal=current.subtotal + order.price)
 
-    #reverse the user back to the menu
+    # reverse the user back to the menu
     return HttpResponseRedirect(reverse("menu"))
 
-@login_required(login_url = '/orders/login/')
-def remove_from_cart(request, cart_id):
-    #query for the object in the cart and the current subtotal
-    item = Cart.objects.get(user = request.user, id = cart_id)
-    current = Order.objects.get(user = request.user, complete = False)
 
-    #remove the clicked object from the database
+@login_required(login_url='/orders/login/')
+def remove_from_cart(request, cart_id):
+    # query for the object in the cart and the current subtotal
+    item = Cart.objects.get(user=request.user, id=cart_id)
+    current = Order.objects.get(user=request.user, complete=False)
+
+    # remove the clicked object from the database
     item.delete()
 
-    #get all the items currently in the cart
+    # get all the items currently in the cart
     #cart = Cart.objects.filter(user = request.user)
 
-    ##reduce the subtotal of the order
+    # reduce the subtotal of the order
     #Order.objects.filter(user = request.user, complete = False).update(subtotal = current.price - item.price)
 
-    #try calculating the new subtotal using the aggregate method instead of adding/subtracting
+    # try calculating the new subtotal using the aggregate method instead of adding/subtracting
     #Order.objects.filter(user = request.user, complete = False).update(subtotal = cart.aggregate(Sum('price')))
-    if Cart.objects.filter(user = request.user).count() == 0:
+    if Cart.objects.filter(user=request.user).count() == 0:
         total = 0.00
     else:
-        total = Cart.objects.filter(user = request.user).aggregate(Sum('price'))['price__sum'] #returns the value of the price__sum key
+        total = Cart.objects.filter(user=request.user).aggregate(Sum('price'))[
+            'price__sum']  # returns the value of the price__sum key
 
-    Order.objects.filter(user = request.user, complete = False).update(subtotal = total)
-
+    Order.objects.filter(
+        user=request.user, complete=False).update(subtotal=total)
 
     return HttpResponseRedirect(reverse("menu"))
 
-#complete the order
-@login_required(login_url = '/orders/login/')
+# complete the order
+
+
+@login_required(login_url='/orders/login/')
 def place_order(request):
-    if Order.objects.filter(user = request.user, complete = False).exists():
-        Order.objects.filter(user = request.user, complete = False).update(complete = True)
+    if Order.objects.filter(user=request.user, complete=False).exists():
+        Order.objects.filter(
+            user=request.user, complete=False).update(complete=True)
     else:
         pass
-        #notify the user that there are no items currently in the cart
-    Cart.objects.filter(user = request.user).delete()
+        # notify the user that there are no items currently in the cart
+    Cart.objects.filter(user=request.user).delete()
     return HttpResponseRedirect(reverse('menu'))
 
-@login_required(login_url = '/orders/login/')
+
+@login_required(login_url='/orders/login/')
 def checkout(request):
     stripe.api_key = settings.STRIPE_PUBLISHABLE_KEY
     session = stripe.checkout.Session.create(
-    payment_method_types=['card'],
-    line_items=[{
-    'price_data': {
-        'currency': 'usd',
-        'price': Order.objects.get(user = request.user, complete = False).subtotal,
-        'product_data': {
-        'name': 'order',
-        },
-    },
-    'quantity': 1,
-    }],
-    mode='payment',
-    success_url= request.build_absolute_uri(reverse('menu')) + '?session_id={CHECKOUT_SESSION_ID}',
-    cancel_url= request.build_absolute_uri(reverse('index'))
-  )
-  context = {
-  'session_id':session.id,
-  'STRIPE_PUBLISHABLE_KEY':settings.STRIPE_PUBLISHABLE_KEY
-  }
-  return render(request, 'orders/orders.html', context)
+        payment_method_types=['card'],
+        line_items=[{
+            'price_data': {
+                'currency': 'usd',
+                'price': Order.objects.get(user=request.user, complete=False).subtotal,
+                'product_data': {
+                    'name': 'order',
+                },
+            },
+            'quantity': 1,
+        }],
+        mode='payment',
+        success_url=request.build_absolute_uri(
+            reverse('menu')) + '?session_id={CHECKOUT_SESSION_ID}',
+        cancel_url=request.build_absolute_uri(reverse('index'))
+    )
+    context = {
+        'session_id': session.id,
+        'STRIPE_PUBLISHABLE_KEY': settings.STRIPE_PUBLISHABLE_KEY
+    }
+    return render(request, 'orders/orders.html', context)
 
 
 # #configurate the stripe api and payments
@@ -168,7 +185,7 @@ def checkout(request):
 #         return JsonResponse(stripe_config, safe=False)
 
 
-#place order and charge the customer using the Stripe API
+# place order and charge the customer using the Stripe API
 # @login_required(login_url = '/orders/login/')
 # def checkout(request):
 #

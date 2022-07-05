@@ -12,11 +12,11 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 
 import os
 
-#configures the template that crispy forms uses for the registration forms
-CRISPY_TEMPLATE_PACK="bootstrap4"
+# configures the template that crispy forms uses for the registration forms
+CRISPY_TEMPLATE_PACK = "bootstrap4"
 
-#CSRF token:
-CSRF_COOKIE_SECURE=False
+# CSRF token:
+CSRF_COOKIE_SECURE = False
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -29,9 +29,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'i0&iq&e9u9h6(4_7%pt2s9)f=c$kso=k$c$w@fi9215s=1q0^d'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -51,6 +51,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -110,7 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 if DEBUG:
-    #test keys
+    # test keys
     STRIPE_PUBLISHABLE_KEY = 'pk_test_51HGRDpI2Nu98lgt7CcGeNFQRZiqjTMM9emJ28YerE7zUVHhQTXszGMZAEGptEYHQSMRnStGzMo0C9L8ZXr1JBDrz00evkTwDCU'
     STRIPE_SECRET_KEY = 'sk_test_51HGRDpI2Nu98lgt7LnizEKT7bPmeABSwfX4HQTm1NK1BtaHora6uGrgQfeQae17vI92aIterXKiA0PD4OVtZwyBB008wEHd2hT'
 else:
@@ -133,6 +134,9 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 #STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
